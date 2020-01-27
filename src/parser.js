@@ -48,7 +48,11 @@ function collectPosts(data, config) {
 			},
 			frontmatter: {
 				title: getPostTitle(post),
-				date: getPostDate(post)
+				slug: getPostSlug(post),
+				description: getPostDescription(post),
+				date: getPostDate(post),
+				author: getPostCreator(post),
+				tags: String(getPostTags(post))
 			},
 			content: translator.getPostContent(post, turndownService, config)
 		}));
@@ -63,6 +67,19 @@ function getPostId(post) {
 
 function getPostSlug(post) {
 	return post.post_name[0];
+}
+
+function getPostCreator(post) {
+	if (post.creator[0] == "nathan") {
+		return "Nathan Glover"
+	}
+	return post.creator[0]
+}
+
+function getPostDescription(post) {
+	const postmeta = post.postmeta.find(postmeta => postmeta.meta_key[0] === '_yoast_wpseo_opengraph-description');
+	const description = postmeta ? postmeta.meta_value[0] : '';
+	return description;
 }
 
 function getPostCoverImageId(post) {
@@ -80,7 +97,27 @@ function getPostTitle(post) {
 }
 
 function getPostDate(post) {
-	return luxon.DateTime.fromRFC2822(post.pubDate[0], { zone: 'utc' }).toISODate();
+	return luxon.DateTime.fromRFC2822(post.pubDate[0], { zone: 'utc' }).toISODate() + ' 00:00:00';
+}
+
+function getPostTags(post) {
+	tags = []
+	if (post.category.length > 0) {
+		post.category.forEach(item => {
+			if (item.$.domain === 'category') {
+				tags.push(item.$.nicename)
+			}
+		});
+	}
+	tagString = '['
+	tags.forEach(tag => {
+		tagString += '\"' + tag + '\", '
+	});
+	if (tags.length > 0) {
+		tagString = tagString.slice(0, -2);
+	}
+	tagString += ']'
+	return tagString
 }
 
 function collectAttachedImages(data) {
@@ -133,7 +170,7 @@ function mergeImagesIntoPosts(images, posts) {
 		if (post) {
 			if (image.id === post.meta.coverImageId) {
 				// save cover image filename to frontmatter
-				post.frontmatter.coverImage = shared.getFilenameFromUrl(image.url);
+				post.frontmatter.featuredImage = `img/${shared.getFilenameFromUrl(image.url)}`;
 			}
 			
 			// save (unique) full image URLs for downloading later

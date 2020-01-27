@@ -57,8 +57,8 @@ async function loadMarkdownFilePromise(post) {
 	let output = '---\n';
 	Object.entries(post.frontmatter).forEach(pair => {
 		const key = pair[0];
-		const value = (pair[1] || '').replace(/"/g, '\\"');
-		output += key + ': "' + value + '"\n';
+		const value = (pair[1] || '');
+		output += key + ': ' + value + '\n';
 	});
 	output += '---\n\n' + post.content + '\n';
 	return output;
@@ -69,7 +69,7 @@ async function writeImageFilesPromise(posts, config) {
 	let delay = 0;
 	const payloads = posts.flatMap(post => {
 		const postPath = getPostPath(post, config);
-		const imagesDir = path.join(path.dirname(postPath), 'images');
+		const imagesDir = path.join(path.dirname(postPath), 'img');
 		return post.meta.imageUrls.map(imageUrl => {
 			const filename = shared.getFilenameFromUrl(imageUrl);
 			const payload = {

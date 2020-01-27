@@ -62,9 +62,9 @@ function getPostContent(post, turndownService, config) {
 	content = content.replace(/(\r?\n){2}/g, '\n<div></div>\n');
 
 	if (config.saveScrapedImages) {
-		// writeImageFile() will save all content images to a relative /images
+		// writeImageFile() will save all content images to a relative /img
         // folder so update references in post content to match
-		content = content.replace(/(<img[^>]*src=").*?([^/"]+\.(?:gif|jpe?g|png))("[^>]*>)/gi, '$1images/$2$3');
+		content = content.replace(/(<img[^>]*src=").*?([^/"]+\.(?:gif|jpe?g|png))("[^>]*>)/gi, '$1img/$2$3');
 	}
 
 	// this is a hack to make <iframe> nodes non-empty by inserting a "." which
